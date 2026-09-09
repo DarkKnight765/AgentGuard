@@ -4,6 +4,7 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import http from 'http';
 import { initSocketServer } from './services/socket';
 import { initPolicyEngine } from './services/policyEngine';
@@ -15,6 +16,8 @@ import agentsRouter from './routes/agents';
 import gatewayRouter from './routes/gateway';
 import auditRouter from './routes/audit';
 import policiesRouter from './routes/policies';
+import approvalsRouter from './routes/approvals';
+import authRouter from './routes/auth';
 
 const app = express();
 const server = http.createServer(app);
@@ -27,13 +30,16 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+app.use(cookieParser());
 
 // ─── Routes ─────────────────────────────────────────────────────
 
+app.use('/api/auth', authRouter);
 app.use('/api/agents', agentsRouter);
 app.use('/api/gateway', gatewayRouter);
 app.use('/api/audit', auditRouter);
 app.use('/api/policies', policiesRouter);
+app.use('/api/approvals', approvalsRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => {
