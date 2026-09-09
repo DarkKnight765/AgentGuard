@@ -1,0 +1,24 @@
+node_modules/
+dist/
+.env
+*.log
+
+# Prisma
+backend/src/prisma/migrations/
+backend/node_modules/
+
+# OPA build artifacts
+policies/bundle.tar.gz
+policies/out/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
