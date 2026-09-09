@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Agent {
+  id         String     @id @default(uuid())
+  name       String
+  owner      String
+  role       String     // e.g. "reader", "deployer"
+  status     String     @default("active") // "active" | "suspended"
+  apiKeyHash String
+  createdAt  DateTime   @default(now())
+  policies   Policy[]
+  auditLogs  AuditLog[]
+
+  @@index([apiKeyHash])
+}
+
+model Policy {
+  id         String   @id @default(uuid())
+  agentId    String
+  agent      Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  regoSource String
+  version    Int      @default(1)
+  updatedAt  DateTime @updatedAt
+}
+
+model AuditLog {
+  id          String    @id @default(uuid())
+  agentId     String
+  agent       Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  tool        String
+  argsSummary String
+  decision    String    // "allow" | "deny" | "needs_approval"
+  latencyMs   Int
+  createdAt   DateTime  @default(now())
+  approval    Approval?
+
+  @@index([agentId])
+  @@index([createdAt])
+  @@index([decision])
+}
+
+model Approval {
+  id         String    @id @default(uuid())
+  auditLogId String    @unique
+  auditLog   AuditLog  @relation(fields: [auditLogId], references: [id], onDelete: Cascade)
+  status     String    @default("pending") // "pending" | "approved" | "denied"
+  reviewedBy String?
+  reviewedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([status])
+}
