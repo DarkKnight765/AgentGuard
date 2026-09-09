@@ -78,8 +78,12 @@ export function Login({ onLogin }: { onLogin: () => void }) {
           <img
             src="/hero-brain.jpg"
             alt="Neural Network"
-            className="w-72 h-72 object-contain opacity-60 mix-blend-screen"
-            style={{ filter: 'sepia(0.3) hue-rotate(-10deg) brightness(0.8)' }}
+            className="w-72 h-72 object-cover opacity-70 mix-blend-screen"
+            style={{ 
+              filter: 'sepia(0.3) hue-rotate(-10deg) contrast(1.2) brightness(0.8)',
+              WebkitMaskImage: 'radial-gradient(circle, black 30%, transparent 70%)',
+              maskImage: 'radial-gradient(circle, black 30%, transparent 70%)'
+            }}
           />
         </div>
       </div>
