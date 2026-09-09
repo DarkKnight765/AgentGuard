@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,500;1,600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -32,4 +32,45 @@ body {
 .live-dot {
   @apply w-2 h-2 rounded-full bg-emerald-400;
   animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Landing Page Specific */
+.bg-landing-outer {
+  background-color: #d1d5db; /* Light gray background resembling the outer part */
+  background-image: radial-gradient(circle at top right, #e5e7eb, #9ca3af);
+}
+
+.card-landing-inner {
+  background: radial-gradient(circle at center, #111827, #030712);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.text-gradient-orange {
+  background: linear-gradient(90deg, #f59e0b, #ea580c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.btn-orange {
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  color: #000;
+  border: none;
+  box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.39);
+}
+
+.btn-orange:hover {
+  background: linear-gradient(90deg, #fcd34d, #fbbf24);
+  box-shadow: 0 6px 20px 0 rgba(245, 158, 11, 0.39);
+}
+
+.btn-dark-glow {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.btn-dark-glow:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
 }
