@@ -1,12 +1,13 @@
+import { GoogleLogin } from '@react-oauth/google';
 import { authApi } from '../lib/api';
 
 export function Login({ onLogin }: { onLogin: () => void }) {
-  const handleDevLogin = async () => {
+  const handleGoogleSuccess = async (credentialResponse: any) => {
     try {
-      await authApi.devLogin();
+      await authApi.googleLogin(credentialResponse.credential);
       onLogin();
     } catch (err) {
-      console.error('Dev login failed:', err);
+      console.error('Google login failed:', err);
     }
   };
 
@@ -30,12 +31,14 @@ export function Login({ onLogin }: { onLogin: () => void }) {
         </div>
 
         <div className="flex items-center gap-3">
-          <button onClick={handleDevLogin} className="text-sm text-white/40 hover:text-white/70 transition-colors px-4 py-2">
-            Login
-          </button>
-          <button onClick={handleDevLogin} className="btn-primary text-sm px-6 py-2 rounded-full">
-            Launch App ↗
-          </button>
+          <div className="scale-90 origin-right">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => console.log('Login Failed')}
+              theme="filled_black"
+              shape="pill"
+            />
+          </div>
         </div>
       </nav>
 
@@ -65,12 +68,18 @@ export function Login({ onLogin }: { onLogin: () => void }) {
 
         {/* CTA buttons */}
         <div className="relative z-10 flex items-center gap-4">
-          <button onClick={handleDevLogin} className="btn-ghost text-sm px-8 py-3 rounded-full flex items-center gap-2">
+          <button className="btn-ghost text-sm px-8 py-3 rounded-full flex items-center gap-2">
             Read Docs <span className="text-white/20">↗</span>
           </button>
-          <button onClick={handleDevLogin} className="btn-primary text-sm px-8 py-3 rounded-full flex items-center gap-2">
-            Launch App <span>↗</span>
-          </button>
+          <div className="flex items-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => console.log('Login Failed')}
+              theme="filled_black"
+              shape="pill"
+              text="continue_with"
+            />
+          </div>
         </div>
 
         {/* Hero end */}

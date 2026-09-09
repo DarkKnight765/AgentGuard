@@ -8,9 +8,22 @@ const api = axios.create({
 // ─── Auth ─────────────────────────────────────────────────────
 
 export const authApi = {
-  devLogin: () => api.post('/auth/dev-login'),
-  me: () => api.get('/auth/me'),
-  logout: () => api.post('/auth/logout'),
+  devLogin: async () => {
+    const res = await api.post('/auth/dev-login');
+    return res.data;
+  },
+  googleLogin: async (credential: string) => {
+    const res = await api.post('/auth/google/callback', { credential });
+    return res.data;
+  },
+  logout: async () => {
+    const res = await api.post('/auth/logout');
+    return res.data;
+  },
+  me: async () => {
+    const res = await api.get('/auth/me');
+    return res.data;
+  },
 };
 
 // ─── Agents ───────────────────────────────────────────────────
