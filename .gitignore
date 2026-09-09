@@ -4,7 +4,6 @@ dist/
 *.log
 
 # Prisma
-backend/src/prisma/migrations/
 backend/node_modules/
 
 # OPA build artifacts
