@@ -11,90 +11,143 @@ export function Login({ onLogin }: { onLogin: () => void }) {
   };
 
   return (
-    <div className="min-h-screen bg-landing-outer p-4 md:p-8 lg:p-12 flex items-center justify-center relative overflow-hidden">
-      
-      {/* Abstract fluid background effect elements (optional css shapes) */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-white rounded-full blur-[100px] mix-blend-overlay"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-black rounded-full blur-[100px] mix-blend-overlay"></div>
-      </div>
-
-      {/* Main Inner Card */}
-      <div className="card-landing-inner w-full max-w-7xl rounded-[2rem] overflow-hidden flex flex-col relative z-10" style={{ minHeight: '80vh' }}>
-        
-        {/* Navigation Bar */}
-        <nav className="flex items-center justify-between px-8 py-6 z-20 relative">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-amber-200 to-orange-500 shadow-lg shadow-orange-500/20"></div>
-            <span className="text-white font-semibold text-lg tracking-tight">AgentGuard.</span>
-          </div>
-
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-            <a href="#" className="text-orange-400 hover:text-orange-300 transition-colors">Home</a>
-            <a href="#" className="hover:text-white transition-colors">About</a>
-            <a href="#" className="hover:text-white transition-colors">Agents</a>
-            <a href="#" className="hover:text-white transition-colors">Pricing</a>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button onClick={handleDevLogin} className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
-              Login
-            </button>
-            <button onClick={handleDevLogin} className="text-sm font-medium btn-dark-glow px-5 py-2 rounded-full transition-all">
-              Support
-            </button>
-          </div>
-        </nav>
-
-        {/* Hero Section */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 items-center z-20 relative px-8 pb-12 lg:pb-0">
-          
-          {/* Left Content */}
-          <div className="max-w-xl xl:pl-12">
-            <h1 className="text-5xl lg:text-6xl xl:text-7xl text-white tracking-tight leading-tight mb-6">
-              <span className="font-bold">AgentGuard.</span>
-              <br />
-              <span className="font-serif italic text-slate-300 font-medium">Intelligent</span>
-              <span className="font-bold"> by design</span>
-            </h1>
-            
-            <p className="text-slate-400 text-sm lg:text-base leading-relaxed mb-10 max-w-md">
-              Hey, you've gotta try this cool AI platform! It lets you whip up, launch, 
-              and tweak smart automation solutions without needing to code! Plus, it offers a 
-              user-friendly interface that makes everything super easy to navigate.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-4">
-              <button 
-                onClick={handleDevLogin}
-                className="btn-orange text-sm font-semibold px-8 py-3.5 rounded-full transition-all hover:scale-105 active:scale-95"
-              >
-                Build Your Agent
-              </button>
-              <button 
-                onClick={handleDevLogin}
-                className="btn-dark-glow text-sm font-medium px-8 py-3.5 rounded-full transition-all hover:scale-105 active:scale-95"
-              >
-                View Our Agent
-              </button>
+    <div className="min-h-screen bg-[#050505] flex flex-col">
+      {/* Navigation Bar */}
+      <nav className="flex items-center justify-between px-10 py-5 border-b border-white/[0.04]">
+        <div className="flex items-center gap-8">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-300 to-orange-600 shadow-lg shadow-orange-500/20 flex items-center justify-center">
+              <span className="text-black text-xs font-black">A</span>
             </div>
+            <span className="text-white font-bold text-lg tracking-tight">AgentGuard</span>
           </div>
-
-          {/* Right Content / Brain Graphic */}
-          <div className="relative h-full min-h-[400px] flex items-center justify-center lg:justify-end pr-0 lg:pr-8 xl:pr-16 mt-12 lg:mt-0">
-            {/* Soft glow behind the image */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-orange-500/10 blur-[100px] rounded-full z-0"></div>
-            
-            <img 
-              src="/hero-brain.jpg" 
-              alt="Neural Network Brain" 
-              className="relative z-10 w-full max-w-lg lg:max-w-xl object-contain mix-blend-screen opacity-90 drop-shadow-2xl animate-pulse"
-              style={{ animationDuration: '4s' }}
-            />
+          <div className="hidden md:flex items-center gap-6 text-sm text-white/30">
+            <a href="#" className="text-orange-400 font-medium">Home</a>
+            <a href="#" className="hover:text-white/60 transition-colors">About</a>
+            <a href="#" className="hover:text-white/60 transition-colors">Agents</a>
+            <a href="#" className="hover:text-white/60 transition-colors">Docs</a>
           </div>
         </div>
 
+        <div className="flex items-center gap-3">
+          <button onClick={handleDevLogin} className="text-sm text-white/40 hover:text-white/70 transition-colors px-4 py-2">
+            Login
+          </button>
+          <button onClick={handleDevLogin} className="btn-primary text-sm px-6 py-2 rounded-full">
+            Launch App ↗
+          </button>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <div className="flex-1 flex flex-col items-center justify-center text-center px-6 relative overflow-hidden">
+        {/* Dot pattern */}
+        <div className="absolute inset-0 bg-dots opacity-40"></div>
+
+        {/* Radial glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-500/5 blur-[150px] rounded-full"></div>
+
+        {/* Available tag */}
+        <div className="relative z-10 flex items-center gap-2 mb-8">
+          <span className="live-dot"></span>
+          <span className="text-xs text-white/30 font-medium">Available now, open source</span>
+        </div>
+
+        {/* Main heading */}
+        <h1 className="relative z-10 text-7xl md:text-8xl lg:text-9xl font-black text-white tracking-tighter leading-[0.9] mb-6">
+          AGENT<br />
+          <span className="text-gradient-orange">GUARD</span>
+        </h1>
+
+        <p className="relative z-10 text-white/30 text-lg max-w-md mb-10 leading-relaxed">
+          Home of intelligent agent governance. Intercept, audit, and control every AI tool call in real time.
+        </p>
+
+        {/* CTA buttons */}
+        <div className="relative z-10 flex items-center gap-4">
+          <button onClick={handleDevLogin} className="btn-ghost text-sm px-8 py-3 rounded-full flex items-center gap-2">
+            Read Docs <span className="text-white/20">↗</span>
+          </button>
+          <button onClick={handleDevLogin} className="btn-primary text-sm px-8 py-3 rounded-full flex items-center gap-2">
+            Launch App <span>↗</span>
+          </button>
+        </div>
+
+        {/* Hero image */}
+        <div className="relative z-10 mt-16 mb-8">
+          <img
+            src="/hero-brain.jpg"
+            alt="Neural Network"
+            className="w-72 h-72 object-contain opacity-60 mix-blend-screen"
+            style={{ filter: 'sepia(0.3) hue-rotate(-10deg) brightness(0.8)' }}
+          />
+        </div>
       </div>
+
+      {/* Trust bar */}
+      <div className="border-t border-white/[0.04] py-10 text-center">
+        <p className="text-white/15 text-xs font-medium uppercase tracking-widest mb-6">
+          Trusted by teams building with AI agents
+        </p>
+        <div className="flex items-center justify-center gap-12 text-white/15 text-sm font-bold tracking-wider">
+          <span>⚡ BLASTER</span>
+          <span>🔒 HYPERLOCK</span>
+          <span>◯ RING</span>
+          <span>⬡ THRUSTER</span>
+        </div>
+      </div>
+
+      {/* Why section */}
+      <div className="px-8 py-20 text-center">
+        <span className="section-label">Why Us</span>
+        <h2 className="text-4xl font-bold text-white tracking-tight mt-3 mb-4">
+          AgentGuard Is The Home Of<br />Governed Agents
+        </h2>
+        <p className="text-white/30 text-sm max-w-lg mx-auto mb-12">
+          AgentGuard works at the intersection of security and AI to allow anyone to
+          register, monitor, and govern autonomous Agents.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+          <div className="card card-hover text-left">
+            <div className="text-2xl mb-4">🛡️</div>
+            <h3 className="text-white font-semibold mb-2">Policy Engine</h3>
+            <p className="text-white/20 text-sm leading-relaxed">
+              Sub-millisecond OPA/WASM evaluation. Define rules in Rego, compile once, enforce everywhere.
+            </p>
+          </div>
+          <div className="card card-hover text-left">
+            <div className="text-2xl mb-4">⚡</div>
+            <h3 className="text-white font-semibold mb-2">Real-Time Audit</h3>
+            <p className="text-white/20 text-sm leading-relaxed">
+              Every tool call is logged, streamed via WebSocket, and searchable in the dashboard instantly.
+            </p>
+          </div>
+          <div className="card card-hover text-left">
+            <div className="text-2xl mb-4">🔐</div>
+            <h3 className="text-white font-semibold mb-2">Approval Workflows</h3>
+            <p className="text-white/20 text-sm leading-relaxed">
+              High-risk actions require human review. Approve or deny from the live dashboard in one click.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t border-white/[0.04] px-8 py-8 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-5 h-5 rounded bg-gradient-to-br from-amber-300 to-orange-600 flex items-center justify-center">
+            <span className="text-black text-[8px] font-black">A</span>
+          </div>
+          <span className="text-white/20 text-xs font-medium">AgentGuard</span>
+        </div>
+        <p className="text-white/10 text-xs">Copyright © AgentGuard. All rights reserved.</p>
+        <div className="flex items-center gap-6 text-white/15 text-xs">
+          <a href="#" className="hover:text-white/30 transition-colors">Mission</a>
+          <a href="#" className="hover:text-white/30 transition-colors">Docs</a>
+          <a href="#" className="hover:text-white/30 transition-colors">Contact</a>
+        </div>
+      </footer>
     </div>
   );
 }

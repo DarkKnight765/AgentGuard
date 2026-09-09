@@ -8,7 +8,6 @@ export function Approvals() {
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<string>('pending');
 
-  // Live updates
   const onApprovalNew = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ['approvals'] });
   }, [queryClient]);
@@ -29,50 +28,60 @@ export function Approvals() {
     queryClient.invalidateQueries({ queryKey: ['approvals'] });
   };
 
+  const pendingCount = approvals?.filter(a => a.status === 'pending').length || 0;
+
   return (
     <div>
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white">Approvals</h2>
-        <p className="text-slate-400 text-sm mt-1">Review and decide on pending agent tool calls</p>
+      {/* Header */}
+      <div className="mb-10">
+        <span className="section-label">Security</span>
+        <h2 className="text-3xl font-bold text-white tracking-tight mt-1">Approvals</h2>
+        <p className="text-white/30 text-sm mt-1">Review and decide on pending agent tool calls</p>
       </div>
 
-      {/* Filter tabs */}
-      <div className="flex gap-1 mb-6 bg-surface-900 p-1 rounded-lg border border-slate-700/50 w-fit">
-        {['pending', 'approved', 'denied', ''].map(s => (
-          <button
-            key={s}
-            onClick={() => setFilter(s)}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              filter === s
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            {s || 'All'}
-          </button>
-        ))}
+      {/* Stat + filter row */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="filter-tabs">
+          {['pending', 'approved', 'denied', ''].map(s => (
+            <button
+              key={s}
+              onClick={() => setFilter(s)}
+              className={`filter-tab ${filter === s ? 'filter-tab-active' : ''}`}
+            >
+              {s || 'All'}
+            </button>
+          ))}
+        </div>
+
+        {filter === 'pending' && pendingCount > 0 && (
+          <div className="flex items-center gap-2 text-sm">
+            <span className="live-dot"></span>
+            <span className="text-orange-400 font-medium">{pendingCount} pending</span>
+          </div>
+        )}
       </div>
 
       {/* Approvals list */}
       <div className="space-y-3">
-        {isLoading && <p className="text-slate-400">Loading...</p>}
-        {approvals?.length === 0 && (
-          <div className="card text-center text-slate-400 py-12">
-            No {filter || ''} approvals
+        {isLoading && (
+          <div className="card text-center py-12 text-white/20">Loading approvals...</div>
+        )}
+        {!isLoading && approvals?.length === 0 && (
+          <div className="card text-center py-16">
+            <p className="text-white/20 text-lg mb-2">No {filter || ''} approvals</p>
+            <p className="text-white/10 text-sm">Agent tool calls requiring review will appear here</p>
           </div>
         )}
         {approvals?.map(approval => (
-          <div key={approval.id} className="card flex items-center justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-1">
-                <span className="text-white font-medium">{approval.auditLog.agent.name}</span>
+          <div key={approval.id} className="card card-hover flex items-center justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-white font-semibold">{approval.auditLog.agent.name}</span>
                 <StatusBadge status={approval.auditLog.agent.role} />
-                <span className="text-slate-500">→</span>
-                <code className="text-blue-400 text-sm bg-blue-500/10 px-2 py-0.5 rounded">
-                  {approval.auditLog.tool}
-                </code>
+                <span className="text-white/10">→</span>
+                <span className="code-inline">{approval.auditLog.tool}</span>
               </div>
-              <div className="flex items-center gap-4 text-xs text-slate-400">
+              <div className="flex items-center gap-4 text-xs text-white/20">
                 <span>{new Date(approval.createdAt).toLocaleString()}</span>
                 {approval.auditLog.argsSummary !== '{}' && (
                   <span className="truncate max-w-xs">Args: {approval.auditLog.argsSummary}</span>
@@ -80,19 +89,19 @@ export function Approvals() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 shrink-0">
               <StatusBadge status={approval.status} />
               {approval.status === 'pending' && (
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleDecide(approval.id, 'approve')}
-                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-medium transition-colors"
+                    className="btn-success px-4 py-2 rounded-lg text-xs"
                   >
                     Approve
                   </button>
                   <button
                     onClick={() => handleDecide(approval.id, 'deny')}
-                    className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-lg text-xs font-medium transition-colors"
+                    className="btn-danger px-4 py-2 rounded-lg text-xs"
                   >
                     Deny
                   </button>

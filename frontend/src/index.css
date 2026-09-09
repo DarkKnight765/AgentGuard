@@ -1,76 +1,249 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,500;1,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,500;1,600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Base ───────────────────────────────────────────────────── */
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  @apply bg-surface-950 text-slate-100;
+  background: #050505;
+  color: #e2e8f0;
 }
 
-/* Status badges */
-.badge-allow { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
-.badge-deny { @apply bg-red-500/20 text-red-400 border border-red-500/30; }
-.badge-pending { @apply bg-amber-500/20 text-amber-400 border border-amber-500/30; }
-.badge-needs_approval { @apply bg-amber-500/20 text-amber-400 border border-amber-500/30; }
-.badge-active { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
-.badge-suspended { @apply bg-red-500/20 text-red-400 border border-red-500/30; }
-.badge-approved { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
-.badge-denied { @apply bg-red-500/20 text-red-400 border border-red-500/30; }
+/* ─── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
 
-/* Card styling */
+/* ─── Status Badges ──────────────────────────────────────────── */
+.badge-allow { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+.badge-deny { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+.badge-pending { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+.badge-needs_approval { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+.badge-active { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+.badge-suspended { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+.badge-approved { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+.badge-denied { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+.badge-reader { background: rgba(99, 102, 241, 0.12); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.2); }
+.badge-deployer { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+
+/* ─── Cards ──────────────────────────────────────────────────── */
 .card {
-  @apply bg-surface-900 border border-slate-700/50 rounded-lg p-6;
+  background: #0e0e0e;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 24px;
 }
 
-/* Live indicator pulse */
+.card-hover { transition: border-color 0.2s, box-shadow 0.2s; }
+.card-hover:hover {
+  border-color: rgba(245, 158, 11, 0.15);
+  box-shadow: 0 0 30px -10px rgba(245, 158, 11, 0.08);
+}
+
+/* ─── Stat Cards ─────────────────────────────────────────────── */
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* ─── Buttons ────────────────────────────────────────────────── */
+.btn-primary {
+  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  color: #000;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.25);
+  transition: all 0.2s;
+}
+.btn-primary:hover {
+  box-shadow: 0 6px 20px 0 rgba(245, 158, 11, 0.35);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+
+.btn-success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.btn-success:hover { background: rgba(16, 185, 129, 0.2); }
+
+/* ─── Input fields ───────────────────────────────────────────── */
+.input-dark {
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+.input-dark:focus {
+  outline: none;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.select-dark {
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+  appearance: none;
+}
+.select-dark:focus {
+  outline: none;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+/* ─── Table ──────────────────────────────────────────────────── */
+.table-dark {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.table-dark thead th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #6b7280;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.table-dark tbody tr {
+  transition: background 0.15s;
+}
+.table-dark tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+.table-dark tbody td {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  font-size: 14px;
+}
+
+/* ─── Filter tabs ────────────────────────────────────────────── */
+.filter-tabs {
+  display: inline-flex;
+  gap: 2px;
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 3px;
+}
+.filter-tab {
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+}
+.filter-tab:hover { color: #e2e8f0; }
+.filter-tab-active {
+  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  color: #000;
+  font-weight: 600;
+}
+
+/* ─── Live Indicator ─────────────────────────────────────────── */
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  50% { opacity: 0.3; }
 }
 .live-dot {
-  @apply w-2 h-2 rounded-full bg-emerald-400;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
   animation: pulse-dot 2s ease-in-out infinite;
 }
 
-/* Landing Page Specific */
-.bg-landing-outer {
-  background-color: #d1d5db; /* Light gray background resembling the outer part */
-  background-image: radial-gradient(circle at top right, #e5e7eb, #9ca3af);
+/* ─── Pill badge ─────────────────────────────────────────────── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
+/* ─── Section label ──────────────────────────────────────────── */
+.section-label {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin-bottom: 12px;
+}
+
+/* ─── Code blocks ────────────────────────────────────────────── */
+.code-inline {
+  background: rgba(245, 158, 11, 0.08);
+  color: #fbbf24;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ─── Landing page specific ──────────────────────────────────── */
 .card-landing-inner {
-  background: radial-gradient(circle at center, #111827, #030712);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  background: radial-gradient(ellipse at 60% 20%, #1a1400 0%, #0a0a0a 40%, #050505 100%);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* ─── Dotted pattern overlay ─────────────────────────────────── */
+.bg-dots {
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ─── Gradient text ──────────────────────────────────────────── */
 .text-gradient-orange {
-  background: linear-gradient(90deg, #f59e0b, #ea580c);
+  background: linear-gradient(135deg, #fbbf24, #ea580c);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-.btn-orange {
-  background: linear-gradient(90deg, #fbbf24, #f59e0b);
-  color: #000;
-  border: none;
-  box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.39);
-}
-
-.btn-orange:hover {
-  background: linear-gradient(90deg, #fcd34d, #fbbf24);
-  box-shadow: 0 6px 20px 0 rgba(245, 158, 11, 0.39);
-}
-
-.btn-dark-glow {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-.btn-dark-glow:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
 }

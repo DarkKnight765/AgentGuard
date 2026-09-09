@@ -6,9 +6,9 @@ import { StatusBadge } from '../components/StatusBadge';
 import { useSocket } from '../hooks/useSocket';
 
 const DECISION_COLORS: Record<string, string> = {
-  allow: '#10b981',
-  deny: '#ef4444',
-  needs_approval: '#f59e0b',
+  allow: '#34d399',
+  deny: '#f87171',
+  needs_approval: '#fbbf24',
 };
 
 export function ActivityFeed() {
@@ -16,7 +16,6 @@ export function ActivityFeed() {
   const [page, setPage] = useState(1);
   const [filterDecision, setFilterDecision] = useState<string>('');
 
-  // Live audit feed — new entries appear without page refresh
   const onAuditNew = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ['audit'] });
   }, [queryClient]);
@@ -31,40 +30,68 @@ export function ActivityFeed() {
     }),
   });
 
-  // Build chart data from current page results
   const chartData = data ? [
-    { name: 'allow', count: data.data.filter(l => l.decision === 'allow').length },
-    { name: 'deny', count: data.data.filter(l => l.decision === 'deny').length },
-    { name: 'needs_approval', count: data.data.filter(l => l.decision === 'needs_approval').length },
+    { name: 'Allowed', count: data.data.filter(l => l.decision === 'allow').length },
+    { name: 'Denied', count: data.data.filter(l => l.decision === 'deny').length },
+    { name: 'Pending', count: data.data.filter(l => l.decision === 'needs_approval').length },
   ] : [];
+
+  const totalAllowed = data?.data.filter(l => l.decision === 'allow').length || 0;
+  const totalDenied = data?.data.filter(l => l.decision === 'deny').length || 0;
+  const avgLatency = data?.data.length ? Math.round(data.data.reduce((s, l) => s + l.latencyMs, 0) / data.data.length) : 0;
 
   return (
     <div>
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white">Activity Feed</h2>
-        <p className="text-slate-400 text-sm mt-1">
+      {/* Header */}
+      <div className="mb-10">
+        <span className="section-label">Monitoring</span>
+        <h2 className="text-3xl font-bold text-white tracking-tight mt-1">Activity Feed</h2>
+        <p className="text-white/30 text-sm mt-1 flex items-center gap-2">
           Real-time audit log of all agent tool calls
-          <span className="inline-flex items-center gap-1 ml-2">
-            <span className="live-dot" />
-            <span className="text-emerald-400">Live</span>
-          </span>
+          <span className="live-dot"></span>
+          <span className="text-emerald-400 text-xs font-medium">Live</span>
         </p>
+      </div>
+
+      {/* Stats row */}
+      <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="card card-hover">
+          <p className="text-white/30 text-xs font-medium uppercase tracking-wider mb-2">Total Events</p>
+          <p className="stat-number text-white">{data?.pagination.total || 0}</p>
+        </div>
+        <div className="card card-hover">
+          <p className="text-white/30 text-xs font-medium uppercase tracking-wider mb-2">Allowed</p>
+          <p className="stat-number text-emerald-400">{totalAllowed}</p>
+        </div>
+        <div className="card card-hover">
+          <p className="text-white/30 text-xs font-medium uppercase tracking-wider mb-2">Denied</p>
+          <p className="stat-number text-red-400">{totalDenied}</p>
+        </div>
+        <div className="card card-hover">
+          <p className="text-white/30 text-xs font-medium uppercase tracking-wider mb-2">Avg Latency</p>
+          <p className="stat-number text-orange-400">{avgLatency}<span className="text-lg font-medium text-white/20">ms</span></p>
+        </div>
       </div>
 
       {/* Chart */}
       <div className="card mb-6">
-        <h3 className="text-sm font-medium text-slate-400 mb-4">Decisions (current page)</h3>
-        <ResponsiveContainer width="100%" height={120}>
+        <p className="text-[11px] text-white/30 font-medium uppercase tracking-wider mb-4">Decision Distribution</p>
+        <ResponsiveContainer width="100%" height={100}>
           <BarChart data={chartData} layout="vertical">
             <XAxis type="number" hide />
-            <YAxis type="category" dataKey="name" width={110} tick={{ fill: '#94a3b8', fontSize: 12 }} />
+            <YAxis type="category" dataKey="name" width={70} tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={false} tickLine={false} />
             <Tooltip
-              contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
-              labelStyle={{ color: '#f8fafc' }}
+              contentStyle={{
+                background: '#0e0e0e',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '13px',
+              }}
             />
-            <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+            <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={20}>
               {chartData.map((entry) => (
-                <Cell key={entry.name} fill={DECISION_COLORS[entry.name] || '#64748b'} />
+                <Cell key={entry.name} fill={DECISION_COLORS[entry.name.toLowerCase()] || DECISION_COLORS[entry.name === 'Pending' ? 'needs_approval' : 'allow'] || '#6b7280'} />
               ))}
             </Bar>
           </BarChart>
@@ -72,49 +99,45 @@ export function ActivityFeed() {
       </div>
 
       {/* Filter */}
-      <div className="flex gap-1 mb-4 bg-surface-900 p-1 rounded-lg border border-slate-700/50 w-fit">
-        {['', 'allow', 'deny', 'needs_approval'].map(d => (
-          <button
-            key={d}
-            onClick={() => { setFilterDecision(d); setPage(1); }}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-              filterDecision === d
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            {d || 'All'}
-          </button>
-        ))}
+      <div className="flex items-center justify-between mb-4">
+        <div className="filter-tabs">
+          {['', 'allow', 'deny', 'needs_approval'].map(d => (
+            <button
+              key={d}
+              onClick={() => { setFilterDecision(d); setPage(1); }}
+              className={`filter-tab ${filterDecision === d ? 'filter-tab-active' : ''}`}
+            >
+              {d || 'All'}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Audit log table */}
-      <div className="card overflow-hidden p-0">
-        <table className="w-full">
+      <div className="card p-0 overflow-hidden">
+        <table className="table-dark">
           <thead>
-            <tr className="border-b border-slate-700/50">
-              <th className="text-left text-xs text-slate-400 font-medium px-6 py-3">Time</th>
-              <th className="text-left text-xs text-slate-400 font-medium px-6 py-3">Agent</th>
-              <th className="text-left text-xs text-slate-400 font-medium px-6 py-3">Tool</th>
-              <th className="text-left text-xs text-slate-400 font-medium px-6 py-3">Decision</th>
-              <th className="text-right text-xs text-slate-400 font-medium px-6 py-3">Latency</th>
+            <tr>
+              <th>Time</th>
+              <th>Agent</th>
+              <th>Tool</th>
+              <th>Decision</th>
+              <th className="text-right">Latency</th>
             </tr>
           </thead>
           <tbody>
             {isLoading && (
-              <tr><td colSpan={5} className="px-6 py-8 text-center text-slate-400">Loading...</td></tr>
+              <tr><td colSpan={5} className="text-center py-12 text-white/20">Loading activity...</td></tr>
             )}
             {data?.data.map(log => (
-              <tr key={log.id} className="border-b border-slate-700/30 hover:bg-surface-800/50 transition-colors">
-                <td className="px-6 py-3 text-xs text-slate-400">
+              <tr key={log.id}>
+                <td className="text-white/30 text-sm">
                   {new Date(log.createdAt).toLocaleTimeString()}
                 </td>
-                <td className="px-6 py-3 text-sm text-white">{log.agent?.name || log.agentId.slice(0, 8)}</td>
-                <td className="px-6 py-3">
-                  <code className="text-blue-400 text-xs bg-blue-500/10 px-2 py-0.5 rounded">{log.tool}</code>
-                </td>
-                <td className="px-6 py-3"><StatusBadge status={log.decision} /></td>
-                <td className="px-6 py-3 text-right text-xs text-slate-400">{log.latencyMs}ms</td>
+                <td className="text-white font-medium">{log.agent?.name || log.agentId.slice(0, 8)}</td>
+                <td><span className="code-inline">{log.tool}</span></td>
+                <td><StatusBadge status={log.decision} /></td>
+                <td className="text-right text-white/30 text-sm font-mono">{log.latencyMs}ms</td>
               </tr>
             ))}
           </tbody>
@@ -123,22 +146,22 @@ export function ActivityFeed() {
 
       {/* Pagination */}
       {data && data.pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4">
-          <span className="text-xs text-slate-400">
+        <div className="flex items-center justify-between mt-5">
+          <span className="text-xs text-white/20">
             Page {data.pagination.page} of {data.pagination.totalPages} ({data.pagination.total} total)
           </span>
           <div className="flex gap-2">
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page <= 1}
-              className="px-3 py-1 bg-surface-800 text-slate-300 rounded text-xs disabled:opacity-50"
+              className="btn-ghost px-4 py-1.5 rounded-lg text-xs disabled:opacity-30"
             >
               Previous
             </button>
             <button
               onClick={() => setPage(p => p + 1)}
               disabled={page >= data.pagination.totalPages}
-              className="px-3 py-1 bg-surface-800 text-slate-300 rounded text-xs disabled:opacity-50"
+              className="btn-ghost px-4 py-1.5 rounded-lg text-xs disabled:opacity-30"
             >
               Next
             </button>
