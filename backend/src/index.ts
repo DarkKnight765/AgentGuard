@@ -6,6 +6,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import http from 'http';
 import { initSocketServer } from './services/socket';
+import { initPolicyEngine } from './services/policyEngine';
 import redis from './lib/redis';
 import prisma from './lib/prisma';
 
@@ -13,6 +14,7 @@ import prisma from './lib/prisma';
 import agentsRouter from './routes/agents';
 import gatewayRouter from './routes/gateway';
 import auditRouter from './routes/audit';
+import policiesRouter from './routes/policies';
 
 const app = express();
 const server = http.createServer(app);
@@ -31,6 +33,7 @@ app.use(express.json());
 app.use('/api/agents', agentsRouter);
 app.use('/api/gateway', gatewayRouter);
 app.use('/api/audit', auditRouter);
+app.use('/api/policies', policiesRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => {
@@ -54,6 +57,10 @@ async function start() {
     // Verify Postgres connection
     await prisma.$connect();
     console.log('[Server] Postgres connected');
+
+    // Load precompiled OPA/WASM policy
+    await initPolicyEngine();
+    console.log('[Server] Policy engine ready');
 
     server.listen(PORT, () => {
       console.log(`[Server] AgentGuard backend running on http://localhost:${PORT}`);

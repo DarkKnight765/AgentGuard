@@ -4,6 +4,7 @@ import prisma from '../lib/prisma';
 import { agentAuth } from '../middleware/agentAuth';
 import { getAgentStatus, incrementCallCounter } from '../services/redisCache';
 import { emitAuditNew, emitApprovalNew } from '../services/socket';
+import { evaluatePolicy, toDecision } from '../services/policyEngine';
 
 const router = Router();
 
@@ -19,7 +20,7 @@ const gatewayCheckSchema = z.object({
 // Request lifecycle (spec §5):
 //   1. Agent auth via X-API-Key header
 //   2. Check agent status in Redis — if suspended, deny immediately
-//   3. Evaluate policy (Phase 1: hardcoded role checks; Phase 2: OPA/WASM)
+//   3. Evaluate policy via OPA/WASM in-process
 //   4. Write AuditLog row regardless of outcome
 //   5. allow/deny → return immediately
 //   6. needs_approval → create Approval row, emit WebSocket event, return pending
@@ -39,6 +40,8 @@ router.post('/check', agentAuth, async (req: Request, res: Response) => {
 
   try {
     // Step 1: Check agent status in Redis (kill switch check)
+    // This runs BEFORE policy evaluation — a suspended agent is denied
+    // within milliseconds regardless of what the policy says.
     const status = await getAgentStatus(agent.id);
     if (status === 'suspended') {
       const latencyMs = Date.now() - startTime;
@@ -62,17 +65,17 @@ router.post('/check', agentAuth, async (req: Request, res: Response) => {
       return;
     }
 
-    // Step 2: Evaluate policy (Phase 1 — hardcoded role-based checks)
-    // This matches the base.rego logic from spec §11:
-    //   - reader: allow read*/get*, deny everything else
-    //   - deployer: allow read*, needs_approval for deploy_production/delete_repository
-    //   - delete_repository always needs_approval regardless of role
-    //   - everything else: deny
-    const decision = evaluateHardcodedPolicy(agent.role, tool);
+    // Step 2: Evaluate policy via OPA/WASM (in-process, sub-millisecond)
+    const policyResult = evaluatePolicy({
+      role: agent.role,
+      tool,
+      args,
+    });
+    const decision = toDecision(policyResult);
 
     const latencyMs = Date.now() - startTime;
 
-    // Step 3: Write audit log
+    // Step 3: Write audit log (every call, regardless of outcome)
     const auditLog = await prisma.auditLog.create({
       data: {
         agentId: agent.id,
@@ -114,36 +117,5 @@ router.post('/check', agentAuth, async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-// ─── Hardcoded Policy Evaluation (Phase 1) ──────────────────────
-// Mirrors base.rego logic. Will be replaced by OPA/WASM in Phase 2.
-
-function evaluateHardcodedPolicy(role: string, tool: string): string {
-  // Readers can call anything prefixed "read" or "get"
-  if (role === 'reader') {
-    if (tool.startsWith('read') || tool.startsWith('get')) {
-      return 'allow';
-    }
-  }
-
-  // Deployers can read freely
-  if (role === 'deployer') {
-    if (tool.startsWith('read') || tool.startsWith('get')) {
-      return 'allow';
-    }
-    // Risky actions need approval
-    if (tool === 'deploy_production') {
-      return 'needs_approval';
-    }
-  }
-
-  // delete_repository always needs approval, regardless of role
-  if (tool === 'delete_repository') {
-    return 'needs_approval';
-  }
-
-  // Everything else: deny
-  return 'deny';
-}
 
 export default router;
