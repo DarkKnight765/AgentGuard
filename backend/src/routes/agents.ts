@@ -93,7 +93,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
     return;
   }
 
-  const { id } = req.params;
+  const id = req.params.id as string;
   const data = parsed.data;
 
   if (Object.keys(data).length === 0) {
@@ -135,7 +135,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
 // ─── DELETE /api/agents/:id — Remove an agent ──────────────────
 
 router.delete('/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
 
   try {
     await prisma.agent.delete({ where: { id } });
