@@ -73,33 +73,10 @@ export function Login({ onLogin }: { onLogin: () => void }) {
           </button>
         </div>
 
-        {/* Hero image */}
-        <div className="relative z-10 mt-16 mb-8">
-          <img
-            src="/hero-brain.jpg"
-            alt="Neural Network"
-            className="w-72 h-72 object-cover opacity-70 mix-blend-screen"
-            style={{ 
-              filter: 'sepia(0.3) hue-rotate(-10deg) contrast(1.2) brightness(0.8)',
-              WebkitMaskImage: 'radial-gradient(circle, black 30%, transparent 70%)',
-              maskImage: 'radial-gradient(circle, black 30%, transparent 70%)'
-            }}
-          />
-        </div>
+        {/* Hero end */}
       </div>
 
-      {/* Trust bar */}
-      <div className="border-t border-white/[0.04] py-10 text-center">
-        <p className="text-white/15 text-xs font-medium uppercase tracking-widest mb-6">
-          Trusted by teams building with AI agents
-        </p>
-        <div className="flex items-center justify-center gap-12 text-white/15 text-sm font-bold tracking-wider">
-          <span>⚡ BLASTER</span>
-          <span>🔒 HYPERLOCK</span>
-          <span>◯ RING</span>
-          <span>⬡ THRUSTER</span>
-        </div>
-      </div>
+
 
       {/* Why section */}
       <div className="px-8 py-20 text-center">
