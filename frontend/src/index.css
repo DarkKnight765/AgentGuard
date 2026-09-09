@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  @apply bg-surface-950 text-slate-100;
+}
+
+/* Status badges */
+.badge-allow { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
+.badge-deny { @apply bg-red-500/20 text-red-400 border border-red-500/30; }
+.badge-pending { @apply bg-amber-500/20 text-amber-400 border border-amber-500/30; }
+.badge-needs_approval { @apply bg-amber-500/20 text-amber-400 border border-amber-500/30; }
+.badge-active { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
+.badge-suspended { @apply bg-red-500/20 text-red-400 border border-red-500/30; }
+.badge-approved { @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30; }
+.badge-denied { @apply bg-red-500/20 text-red-400 border border-red-500/30; }
+
+/* Card styling */
+.card {
+  @apply bg-surface-900 border border-slate-700/50 rounded-lg p-6;
+}
+
+/* Live indicator pulse */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.live-dot {
+  @apply w-2 h-2 rounded-full bg-emerald-400;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
