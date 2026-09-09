@@ -6,9 +6,8 @@ dist/
 # Prisma
 backend/node_modules/
 
-# OPA build artifacts
+# OPA build artifacts (intermediate only — policy.wasm is committed)
 policies/bundle.tar.gz
-policies/out/
 
 # Frontend
 frontend/node_modules/
