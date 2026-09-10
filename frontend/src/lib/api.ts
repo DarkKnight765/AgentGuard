@@ -21,13 +21,6 @@ api.interceptors.request.use((config) => {
 // ─── Auth ─────────────────────────────────────────────────────
 
 export const authApi = {
-  devLogin: async () => {
-    const res = await api.post('/auth/dev-login');
-    if (res.data?.token) {
-      localStorage.setItem('agentguard_token', res.data.token);
-    }
-    return res.data;
-  },
   googleLogin: async (credential: string) => {
     const res = await api.post('/auth/google/callback', { credential });
     if (res.data?.token) {

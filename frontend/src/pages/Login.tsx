@@ -24,22 +24,6 @@ export function Login({ onLogin }: { onLogin: () => void }) {
     }
   };
 
-  const handleDevLogin = async () => {
-    try {
-      setError(null);
-      setLoading(true);
-      await authApi.devLogin();
-      onLogin();
-      navigate('/agents');
-    } catch (err: any) {
-      console.error('Dev login failed:', err);
-      const msg = err.response?.data?.error || err.message || 'Dev login disabled in production';
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#050505] flex flex-col">
       {/* Navigation Bar */}
@@ -60,12 +44,6 @@ export function Login({ onLogin }: { onLogin: () => void }) {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            onClick={handleDevLogin}
-            className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/10 hover:bg-white/20 text-white transition-all border border-white/10 flex items-center gap-1.5"
-          >
-            ⚡ Dev Mode Login
-          </button>
           <div className="scale-90 origin-right">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
@@ -101,24 +79,23 @@ export function Login({ onLogin }: { onLogin: () => void }) {
           Home of intelligent agent governance. Intercept, audit, and control every AI tool call in real time.
         </p>
 
-        {/* CTA buttons */}
-        <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4">
-          <button
-            onClick={handleDevLogin}
-            disabled={loading}
-            className="btn-primary text-sm px-7 py-3 rounded-full flex items-center gap-2 shadow-lg shadow-orange-500/20 disabled:opacity-50"
-          >
-            {loading ? 'Authenticating...' : '⚡ Sign in (Dev Mode)'}
-          </button>
-          <div className="flex items-center">
+        {/* CTA button */}
+        <div className="relative z-10 flex flex-col items-center gap-4">
+          <div className="scale-110 shadow-xl shadow-orange-500/10 rounded-full">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={() => setError('Google popup login failed or was closed.')}
               theme="filled_black"
               shape="pill"
+              size="large"
               text="continue_with"
             />
           </div>
+          {loading && (
+            <div className="text-xs text-orange-400 font-mono animate-pulse">
+              Authenticating with gateway...
+            </div>
+          )}
         </div>
 
         {error && (

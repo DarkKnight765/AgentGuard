@@ -59,31 +59,6 @@ router.post('/google/callback', async (req: Request, res: Response) => {
   }
 });
 
-// ─── POST /api/auth/dev-login — Dev-only login bypass ───────────
-// Skips Google OAuth for local development.
-
-router.post('/dev-login', async (_req: Request, res: Response) => {
-  if (process.env.NODE_ENV === 'production') {
-    res.status(403).json({ error: 'Dev login disabled in production' });
-    return;
-  }
-
-  const token = jwt.sign(
-    { sub: 'dev-user', email: 'dev@agentguard.local', name: 'Dev Admin' },
-    JWT_SECRET,
-    { expiresIn: '24h' }
-  );
-
-  res.cookie('agentguard_token', token, {
-    httpOnly: true,
-    secure: false,
-    sameSite: 'lax',
-    maxAge: 24 * 60 * 60 * 1000,
-  });
-
-  res.json({ user: { email: 'dev@agentguard.local', name: 'Dev Admin' }, token });
-});
-
 // ─── GET /api/auth/me — Get current user from JWT ───────────────
 
 router.get('/me', (req: Request, res: Response) => {
