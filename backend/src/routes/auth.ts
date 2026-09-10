@@ -63,8 +63,8 @@ router.post('/google/callback', async (req: Request, res: Response) => {
 // aren't configured. Only available when GOOGLE_CLIENT_ID is empty.
 
 router.post('/dev-login', async (_req: Request, res: Response) => {
-  if (GOOGLE_CLIENT_ID) {
-    res.status(403).json({ error: 'Dev login disabled when Google OAuth is configured' });
+  if (process.env.NODE_ENV === 'production' || GOOGLE_CLIENT_ID) {
+    res.status(403).json({ error: 'Dev login disabled in production or when Google OAuth is configured' });
     return;
   }
 
