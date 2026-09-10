@@ -12,7 +12,8 @@
  *  8. Sub-millisecond kill-switch enforcement on very next call
  */
 
-const API_BASE = process.env.API_URL || 'http://localhost:3001/api';
+const rawUrl = (process.env.API_URL || 'http://localhost:3001').trim().replace(/\/+$/, '');
+const API_BASE = rawUrl.endsWith('/api') ? rawUrl : `${rawUrl}/api`;
 
 // Terminal colors
 const RESET = '\x1b[0m';
