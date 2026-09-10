@@ -40,6 +40,7 @@ export interface Agent {
 
 export const agentsApi = {
   list: () => api.get<Agent[]>('/agents').then(r => r.data),
+  get: (id: string) => api.get<Agent>(`/agents/${id}`).then(r => r.data),
   create: (data: { name: string; owner: string; role: string }) =>
     api.post<Agent & { apiKey: string }>('/agents', data).then(r => r.data),
   update: (id: string, data: { role?: string; status?: string }) =>

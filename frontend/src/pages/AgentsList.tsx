@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { agentsApi } from '../lib/api';
+import { agentsApi, approvalsApi, auditApi } from '../lib/api';
 import type { Agent } from '../lib/api';
 import { StatusBadge } from '../components/StatusBadge';
 import { useSocket } from '../hooks/useSocket';
@@ -11,17 +12,41 @@ export function AgentsList() {
   const [newAgent, setNewAgent] = useState({ name: '', owner: '', role: 'reader' });
   const [createdKey, setCreatedKey] = useState<string | null>(null);
 
+  // Real-time updates via WebSocket
   const onAgentStatus = useCallback((data: { agentId: string; status: string }) => {
     queryClient.setQueryData<Agent[]>(['agents'], (old) =>
       old?.map(a => a.id === data.agentId ? { ...a, status: data.status } : a)
     );
   }, [queryClient]);
 
-  useSocket({ onAgentStatus });
+  const onApprovalNew = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['approvals', 'pending'] });
+  }, [queryClient]);
 
-  const { data: agents, isLoading } = useQuery({
+  const onApprovalResolved = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['approvals', 'pending'] });
+  }, [queryClient]);
+
+  const onAuditNew = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['audit', 'stats'] });
+  }, [queryClient]);
+
+  useSocket({ onAgentStatus, onApprovalNew, onApprovalResolved, onAuditNew });
+
+  // Individual, resilient queries — one slow query will never block rendering the others
+  const { data: agents, isLoading: agentsLoading } = useQuery({
     queryKey: ['agents'],
     queryFn: agentsApi.list,
+  });
+
+  const { data: pendingApprovals, isLoading: approvalsLoading } = useQuery({
+    queryKey: ['approvals', 'pending'],
+    queryFn: () => approvalsApi.list('pending'),
+  });
+
+  const { data: auditData, isLoading: auditLoading } = useQuery({
+    queryKey: ['audit', 'stats'],
+    queryFn: () => auditApi.list({ page: 1 }),
   });
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -42,18 +67,20 @@ export function AgentsList() {
     queryClient.invalidateQueries({ queryKey: ['agents'] });
   };
 
-  const activeCount = agents?.filter(a => a.status === 'active').length || 0;
-  const totalCount = agents?.length || 0;
-  const suspendedCount = agents?.filter(a => a.status === 'suspended').length || 0;
+  const totalCount = agents?.length ?? 0;
+  const activeCount = agents?.filter(a => a.status === 'active').length ?? 0;
+  const suspendedCount = agents?.filter(a => a.status === 'suspended').length ?? 0;
+  const pendingCount = pendingApprovals?.length ?? 0;
+  const totalCalls = auditData?.pagination.total ?? 0;
 
   return (
     <div>
       {/* Header */}
       <div className="flex items-center justify-between mb-10">
         <div>
-          <span className="section-label">Dashboard</span>
-          <h2 className="text-3xl font-bold text-white tracking-tight mt-1">Your Agents</h2>
-          <p className="text-white/30 text-sm mt-1">Manage and monitor registered AI agents</p>
+          <span className="section-label">Operations Console</span>
+          <h2 className="text-3xl font-bold text-white tracking-tight mt-1">Registered Agents</h2>
+          <p className="text-white/30 text-sm mt-1">Manage agent lifecycle, monitor health, and trigger the emergency kill switch</p>
         </div>
         <button
           onClick={() => { setShowCreate(!showCreate); setCreatedKey(null); }}
@@ -63,19 +90,37 @@ export function AgentsList() {
         </button>
       </div>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      {/* 5-Metric Operations Stats Bar — each card loads independently */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         <div className="card card-hover">
           <p className="text-white/30 text-xs font-medium uppercase tracking-wider mb-2">Total Agents</p>
-          <p className="stat-number text-white">{totalCount}</p>
+          <p className="stat-number text-white">
+            {agentsLoading ? <span className="text-white/20 animate-pulse text-2xl font-normal">...</span> : totalCount}
+          </p>
         </div>
         <div className="card card-hover">
           <p className="text-white/30 text-xs font-medium uppercase tracking-wider mb-2">Active</p>
-          <p className="stat-number text-emerald-400">{activeCount}</p>
+          <p className="stat-number text-emerald-400">
+            {agentsLoading ? <span className="text-white/20 animate-pulse text-2xl font-normal">...</span> : activeCount}
+          </p>
         </div>
         <div className="card card-hover">
           <p className="text-white/30 text-xs font-medium uppercase tracking-wider mb-2">Suspended</p>
-          <p className="stat-number text-red-400">{suspendedCount}</p>
+          <p className="stat-number text-red-400">
+            {agentsLoading ? <span className="text-white/20 animate-pulse text-2xl font-normal">...</span> : suspendedCount}
+          </p>
+        </div>
+        <div className="card card-hover">
+          <p className="text-white/30 text-xs font-medium uppercase tracking-wider mb-2">Pending Approvals</p>
+          <p className="stat-number text-amber-400">
+            {approvalsLoading ? <span className="text-white/20 animate-pulse text-2xl font-normal">...</span> : pendingCount}
+          </p>
+        </div>
+        <div className="card card-hover">
+          <p className="text-white/30 text-xs font-medium uppercase tracking-wider mb-2">Total Interceptions</p>
+          <p className="stat-number text-sky-400">
+            {auditLoading ? <span className="text-white/20 animate-pulse text-2xl font-normal">...</span> : totalCalls}
+          </p>
         </div>
       </div>
 
@@ -83,7 +128,7 @@ export function AgentsList() {
       {showCreate && (
         <div className="card mb-6">
           <h3 className="text-base font-semibold text-white mb-5">Register New Agent</h3>
-          <form onSubmit={handleCreate} className="flex gap-4 items-end">
+          <form onSubmit={handleCreate} className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
             <div className="flex-1">
               <label className="block text-[11px] text-white/30 font-medium uppercase tracking-wider mb-2">Name</label>
               <input
@@ -147,22 +192,36 @@ export function AgentsList() {
             </tr>
           </thead>
           <tbody>
-            {isLoading && (
+            {agentsLoading && (
               <tr><td colSpan={6} className="text-center py-12 text-white/20">Loading agents...</td></tr>
             )}
-            {agents?.length === 0 && !isLoading && (
+            {agents?.length === 0 && !agentsLoading && (
               <tr><td colSpan={6} className="text-center py-12 text-white/20">No agents registered yet</td></tr>
             )}
             {agents?.map(agent => (
               <tr key={agent.id}>
-                <td className="font-medium text-white">{agent.name}</td>
+                <td>
+                  <Link
+                    to={`/agents/${agent.id}`}
+                    className="font-medium text-white hover:text-emerald-400 transition-colors inline-flex items-center gap-1.5 group"
+                  >
+                    <span>{agent.name}</span>
+                    <span className="text-white/20 group-hover:text-emerald-400 text-xs transition-colors">→</span>
+                  </Link>
+                </td>
                 <td className="text-white/40">{agent.owner}</td>
                 <td><StatusBadge status={agent.role} /></td>
                 <td><StatusBadge status={agent.status} /></td>
                 <td className="text-white/30 text-sm">
                   {new Date(agent.createdAt).toLocaleDateString()}
                 </td>
-                <td className="text-right">
+                <td className="text-right space-x-2">
+                  <Link
+                    to={`/agents/${agent.id}`}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/60 hover:text-white bg-white/5 hover:bg-white/10 transition-all inline-block"
+                  >
+                    Details
+                  </Link>
                   <button
                     onClick={() => toggleStatus(agent)}
                     className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${

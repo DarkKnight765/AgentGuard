@@ -42,6 +42,36 @@ router.get('/', async (_req: Request, res: Response) => {
   }
 });
 
+// ─── GET /api/agents/:id — Get a single agent ───────────────────
+
+router.get('/:id', async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+
+  try {
+    const agent = await prisma.agent.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        owner: true,
+        role: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    if (!agent) {
+      res.status(404).json({ error: 'Agent not found' });
+      return;
+    }
+
+    res.json(agent);
+  } catch (err) {
+    console.error('[Agents] Get error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // ─── POST /api/agents — Register a new agent ───────────────────
 // Returns the plaintext API key ONCE. Only the SHA-256 hash is stored.
 
