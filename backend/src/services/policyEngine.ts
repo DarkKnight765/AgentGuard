@@ -22,7 +22,7 @@ let needsApprovalEntrypoint: number | undefined;
  * Call this once at server startup.
  */
 export async function initPolicyEngine(wasmPath?: string): Promise<void> {
-  const resolvedPath = wasmPath || path.resolve(__dirname, '../../..', 'policies/out/policy.wasm');
+  const resolvedPath = wasmPath || process.env.POLICY_WASM_PATH || path.resolve(__dirname, '../../..', 'policies/out/policy.wasm');
 
   if (!fs.existsSync(resolvedPath)) {
     throw new Error(

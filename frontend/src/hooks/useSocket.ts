@@ -6,8 +6,9 @@ let socket: Socket | null = null;
 
 function getSocket(): Socket {
   if (!socket) {
-    // In local dev on Vite port 5173, connect directly to backend port 3001
-    const url = window.location.port === '5173' ? 'http://localhost:3001' : '/';
+    // In production, connect to VITE_API_URL. In local dev, connect to port 3001 or current host.
+    const rawUrl = import.meta.env.VITE_API_URL || (window.location.port === '5173' ? 'http://localhost:3001' : '/');
+    const url = rawUrl.replace(/\/+$/, '');
     socket = io(url, {
       autoConnect: true,
       transports: ['websocket', 'polling'],

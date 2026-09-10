@@ -9,6 +9,7 @@
     "start": "node dist/index.js",
     "lint": "tsc --noEmit",
     "test": "jest",
+    "prisma:deploy": "prisma migrate deploy",
     "demo": "ts-node --project tsconfig.json ../demo/simulate.ts"
   },
   "prisma": {

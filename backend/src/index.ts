@@ -25,9 +25,29 @@ const server = http.createServer(app);
 
 // ─── Middleware ──────────────────────────────────────────────────
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost',
+].filter(Boolean) as string[];
+
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.some(o => origin === o || origin.startsWith(o))) {
+      return callback(null, true);
+    }
+    try {
+      if (/\.onrender\.com$/.test(new URL(origin).hostname)) {
+        return callback(null, true);
+      }
+    } catch {
+      // ignore
+    }
+    callback(null, false);
+  },
   credentials: true,
 }));
 app.use(express.json());

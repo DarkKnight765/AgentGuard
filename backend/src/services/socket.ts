@@ -7,10 +7,30 @@ let io: Server | null = null;
 /**
  * Initialize Socket.io server attached to the given HTTP server.
  */
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost',
+].filter(Boolean) as string[];
+
 export function initSocketServer(httpServer: HttpServer): Server {
   io = new Server(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.some(o => origin === o || origin.startsWith(o))) {
+          return callback(null, true);
+        }
+        try {
+          if (/\.onrender\.com$/.test(new URL(origin).hostname)) {
+            return callback(null, true);
+          }
+        } catch {
+          // ignore
+        }
+        callback(null, false);
+      },
       methods: ['GET', 'POST'],
       credentials: true,
     },
