@@ -43,11 +43,11 @@ router.post('/google/callback', async (req: Request, res: Response) => {
       { expiresIn: '24h' }
     );
 
-    // Set httpOnly cookie
+    // Set httpOnly cookie (sameSite: 'none' required for cross-domain on Render)
     res.cookie('agentguard_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
 

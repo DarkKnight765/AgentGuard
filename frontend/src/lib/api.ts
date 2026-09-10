@@ -9,18 +9,34 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// Attach JWT token from localStorage if available (essential for cross-domain deployments)
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('agentguard_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // ─── Auth ─────────────────────────────────────────────────────
 
 export const authApi = {
   devLogin: async () => {
     const res = await api.post('/auth/dev-login');
+    if (res.data?.token) {
+      localStorage.setItem('agentguard_token', res.data.token);
+    }
     return res.data;
   },
   googleLogin: async (credential: string) => {
     const res = await api.post('/auth/google/callback', { credential });
+    if (res.data?.token) {
+      localStorage.setItem('agentguard_token', res.data.token);
+    }
     return res.data;
   },
   logout: async () => {
+    localStorage.removeItem('agentguard_token');
     const res = await api.post('/auth/logout');
     return res.data;
   },
