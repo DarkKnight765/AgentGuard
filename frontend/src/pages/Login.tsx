@@ -1,22 +1,42 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { authApi } from '../lib/api';
 
 export function Login({ onLogin }: { onLogin: () => void }) {
+  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
   const handleGoogleSuccess = async (credentialResponse: any) => {
     try {
+      setError(null);
+      setLoading(true);
       await authApi.googleLogin(credentialResponse.credential);
       onLogin();
-    } catch (err) {
+      navigate('/agents');
+    } catch (err: any) {
       console.error('Google login failed:', err);
+      const msg = err.response?.data?.error || err.message || 'Login failed';
+      setError(`Google login error: ${msg}`);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDevLogin = async () => {
     try {
+      setError(null);
+      setLoading(true);
       await authApi.devLogin();
       onLogin();
-    } catch (err) {
+      navigate('/agents');
+    } catch (err: any) {
       console.error('Dev login failed:', err);
+      const msg = err.response?.data?.error || err.message || 'Dev login disabled in production';
+      setError(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,7 +69,7 @@ export function Login({ onLogin }: { onLogin: () => void }) {
           <div className="scale-90 origin-right">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
-              onError={() => console.log('Login Failed')}
+              onError={() => setError('Google popup login failed or was closed.')}
               theme="filled_black"
               shape="pill"
             />
@@ -85,20 +105,27 @@ export function Login({ onLogin }: { onLogin: () => void }) {
         <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4">
           <button
             onClick={handleDevLogin}
-            className="btn-primary text-sm px-7 py-3 rounded-full flex items-center gap-2 shadow-lg shadow-orange-500/20"
+            disabled={loading}
+            className="btn-primary text-sm px-7 py-3 rounded-full flex items-center gap-2 shadow-lg shadow-orange-500/20 disabled:opacity-50"
           >
-            ⚡ Sign in (Dev Mode)
+            {loading ? 'Authenticating...' : '⚡ Sign in (Dev Mode)'}
           </button>
           <div className="flex items-center">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
-              onError={() => console.log('Login Failed')}
+              onError={() => setError('Google popup login failed or was closed.')}
               theme="filled_black"
               shape="pill"
               text="continue_with"
             />
           </div>
         </div>
+
+        {error && (
+          <div className="relative z-10 mt-5 px-5 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono max-w-md animate-fade-in text-center">
+            ⚠️ {error}
+          </div>
+        )}
 
         {/* Hero end */}
       </div>
