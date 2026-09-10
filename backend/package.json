@@ -9,7 +9,7 @@
     "start": "node dist/index.js",
     "lint": "tsc --noEmit",
     "test": "jest",
-    "demo": "ts-node ../demo/simulate.ts"
+    "demo": "ts-node --project tsconfig.json ../demo/simulate.ts"
   },
   "prisma": {
     "schema": "src/prisma/schema.prisma",
