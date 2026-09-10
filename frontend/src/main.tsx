@@ -6,7 +6,8 @@ import './index.css'
 import App from './App'
 
 const queryClient = new QueryClient();
-const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+const DEFAULT_GOOGLE_CLIENT_ID = '1052384919677-1ns5sa8sn2oc9q0f1ri4h9ci4oos833u.apps.googleusercontent.com';
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || DEFAULT_GOOGLE_CLIENT_ID;
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
