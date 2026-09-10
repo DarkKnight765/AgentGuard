@@ -11,6 +11,15 @@ export function Login({ onLogin }: { onLogin: () => void }) {
     }
   };
 
+  const handleDevLogin = async () => {
+    try {
+      await authApi.devLogin();
+      onLogin();
+    } catch (err) {
+      console.error('Dev login failed:', err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#050505] flex flex-col">
       {/* Navigation Bar */}
@@ -31,6 +40,12 @@ export function Login({ onLogin }: { onLogin: () => void }) {
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            onClick={handleDevLogin}
+            className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/10 hover:bg-white/20 text-white transition-all border border-white/10 flex items-center gap-1.5"
+          >
+            ⚡ Dev Mode Login
+          </button>
           <div className="scale-90 origin-right">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
@@ -67,9 +82,12 @@ export function Login({ onLogin }: { onLogin: () => void }) {
         </p>
 
         {/* CTA buttons */}
-        <div className="relative z-10 flex items-center gap-4">
-          <button className="btn-ghost text-sm px-8 py-3 rounded-full flex items-center gap-2">
-            Read Docs <span className="text-white/20">↗</span>
+        <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4">
+          <button
+            onClick={handleDevLogin}
+            className="btn-primary text-sm px-7 py-3 rounded-full flex items-center gap-2 shadow-lg shadow-orange-500/20"
+          >
+            ⚡ Sign in (Dev Mode)
           </button>
           <div className="flex items-center">
             <GoogleLogin
@@ -84,8 +102,6 @@ export function Login({ onLogin }: { onLogin: () => void }) {
 
         {/* Hero end */}
       </div>
-
-
 
       {/* Why section */}
       <div className="px-8 py-20 text-center">

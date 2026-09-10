@@ -59,12 +59,11 @@ router.post('/google/callback', async (req: Request, res: Response) => {
 });
 
 // ─── POST /api/auth/dev-login — Dev-only login bypass ───────────
-// Skips Google OAuth for local development when credentials
-// aren't configured. Only available when GOOGLE_CLIENT_ID is empty.
+// Skips Google OAuth for local development.
 
 router.post('/dev-login', async (_req: Request, res: Response) => {
-  if (process.env.NODE_ENV === 'production' || GOOGLE_CLIENT_ID) {
-    res.status(403).json({ error: 'Dev login disabled in production or when Google OAuth is configured' });
+  if (process.env.NODE_ENV === 'production') {
+    res.status(403).json({ error: 'Dev login disabled in production' });
     return;
   }
 
